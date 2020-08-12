@@ -20,6 +20,25 @@ namespace netcoreClass.Controllers
             _context = context;
         }
 
+        // DELETE: api/CourseInstructor/5
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<ActionResult<CourseInstructor>> DeleteCourseInstructor(int id)
+        {
+            var courseInstructor = await _context.CourseInstructor.FindAsync(id);
+            if (courseInstructor == null)
+            {
+                return NotFound();
+            }
+
+            _context.CourseInstructor.Remove(courseInstructor);
+            await _context.SaveChangesAsync();
+
+            return courseInstructor;
+        }
+
         // GET: api/CourseInstructor
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CourseInstructor>>> GetCourseInstructor()
@@ -29,6 +48,9 @@ namespace netcoreClass.Controllers
 
         // GET: api/CourseInstructor/5
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<CourseInstructor>> GetCourseInstructor(int id)
         {
             var courseInstructor = await _context.CourseInstructor.FindAsync(id);
@@ -41,10 +63,43 @@ namespace netcoreClass.Controllers
             return courseInstructor;
         }
 
+        // POST: api/CourseInstructor
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesDefaultResponseType]
+        public async Task<ActionResult<CourseInstructor>> PostCourseInstructor(CourseInstructor courseInstructor)
+        {
+            _context.CourseInstructor.Add(courseInstructor);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (CourseInstructorExists(courseInstructor.CourseId))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return CreatedAtAction("GetCourseInstructor", new { id = courseInstructor.CourseId }, courseInstructor);
+        }
+
         // PUT: api/CourseInstructor/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> PutCourseInstructor(int id, CourseInstructor courseInstructor)
         {
             if (id != courseInstructor.CourseId)
@@ -71,48 +126,6 @@ namespace netcoreClass.Controllers
             }
 
             return NoContent();
-        }
-
-        // POST: api/CourseInstructor
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<CourseInstructor>> PostCourseInstructor(CourseInstructor courseInstructor)
-        {
-            _context.CourseInstructor.Add(courseInstructor);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (CourseInstructorExists(courseInstructor.CourseId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetCourseInstructor", new { id = courseInstructor.CourseId }, courseInstructor);
-        }
-
-        // DELETE: api/CourseInstructor/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<CourseInstructor>> DeleteCourseInstructor(int id)
-        {
-            var courseInstructor = await _context.CourseInstructor.FindAsync(id);
-            if (courseInstructor == null)
-            {
-                return NotFound();
-            }
-
-            _context.CourseInstructor.Remove(courseInstructor);
-            await _context.SaveChangesAsync();
-
-            return courseInstructor;
         }
 
         private bool CourseInstructorExists(int id)

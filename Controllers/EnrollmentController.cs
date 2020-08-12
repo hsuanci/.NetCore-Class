@@ -20,6 +20,25 @@ namespace netcoreClass.Controllers
             _context = context;
         }
 
+        // DELETE: api/Enrollment/5
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<ActionResult<Enrollment>> DeleteEnrollment(int id)
+        {
+            var enrollment = await _context.Enrollment.FindAsync(id);
+            if (enrollment == null)
+            {
+                return NotFound();
+            }
+
+            _context.Enrollment.Remove(enrollment);
+            await _context.SaveChangesAsync();
+
+            return enrollment;
+        }
+
         // GET: api/Enrollment
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Enrollment>>> GetEnrollment()
@@ -29,6 +48,9 @@ namespace netcoreClass.Controllers
 
         // GET: api/Enrollment/5
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<Enrollment>> GetEnrollment(int id)
         {
             var enrollment = await _context.Enrollment.FindAsync(id);
@@ -41,10 +63,28 @@ namespace netcoreClass.Controllers
             return enrollment;
         }
 
+        // POST: api/Enrollment
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesDefaultResponseType]
+        public async Task<ActionResult<Enrollment>> PostEnrollment(Enrollment enrollment)
+        {
+            _context.Enrollment.Add(enrollment);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetEnrollment", new { id = enrollment.EnrollmentId }, enrollment);
+        }
+
         // PUT: api/Enrollment/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> PutEnrollment(int id, Enrollment enrollment)
         {
             if (id != enrollment.EnrollmentId)
@@ -71,34 +111,6 @@ namespace netcoreClass.Controllers
             }
 
             return NoContent();
-        }
-
-        // POST: api/Enrollment
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Enrollment>> PostEnrollment(Enrollment enrollment)
-        {
-            _context.Enrollment.Add(enrollment);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetEnrollment", new { id = enrollment.EnrollmentId }, enrollment);
-        }
-
-        // DELETE: api/Enrollment/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Enrollment>> DeleteEnrollment(int id)
-        {
-            var enrollment = await _context.Enrollment.FindAsync(id);
-            if (enrollment == null)
-            {
-                return NotFound();
-            }
-
-            _context.Enrollment.Remove(enrollment);
-            await _context.SaveChangesAsync();
-
-            return enrollment;
         }
 
         private bool EnrollmentExists(int id)
